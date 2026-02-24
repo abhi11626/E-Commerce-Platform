@@ -7,7 +7,19 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "e-commerce-backend-xi-eosin.vercel.app",
+      "e-commerce-frontend-one-lemon.vercel.app",
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // only if you're using cookies/auth
+  }),
+);
+
+app.options("*", cors()); // handle preflight
 app.use(express.json());
 
 app.post("/api/create-checkout-session", async (req, res) => {
@@ -39,7 +51,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 });
 
-// Only listen on port 3000 if running locally
+// Only listen on port 5000 if running locally
 if (process.env.NODE_ENV !== "production") {
   app.listen(5000);
 }
