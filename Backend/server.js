@@ -39,4 +39,10 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// Only listen on port 3000 if running locally
+if (process.env.NODE_ENV !== "production") {
+  app.listen(5000);
+}
+
+// Export the app for Vercel serverless functions
+export default app;
