@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const app = express();
 app.use(cors());
@@ -26,8 +27,8 @@ app.post("/api/create-checkout-session", async (req, res) => {
         },
         quantity: item.quantity,
       })),
-      success_url: "http://localhost:5173/success",
-      cancel_url: "http://localhost:5173/cancel",
+      success_url: `${frontendUrl}/success`,
+      cancel_url: `${frontendUrl}/cancel`,
     });
 
     // res.json({ id: session.id });
