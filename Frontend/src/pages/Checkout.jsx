@@ -5,6 +5,9 @@ import CartContext from "../context/CartContext";
 
 export default function Checkout() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  console.log("[FRONTEND] VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL || "NOT SET (using fallback)");
+  console.log("[FRONTEND] Calling backend at:", backendUrl);
+
   const cartCtx = useContext(CartContext);
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +22,7 @@ export default function Checkout() {
     setLoading(true);
 
     try {
-      // Call your backend to create Stripe session
+      console.log("[FRONTEND] Sending", cartCtx.items.length, "items to backend...");
       const response = await fetch(
         `${backendUrl}/api/create-checkout-session`,
         {
@@ -31,18 +34,19 @@ export default function Checkout() {
         },
       );
 
+      console.log("[FRONTEND] Backend response status:", response.status);
+
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("[FRONTEND] Backend error:", errorData);
         throw new Error("Failed to create checkout session");
       }
 
       const session = await response.json();
-
-      // const result = await stripe.redirectToCheckout({
-      //   sessionId: session.id,
-      // });
+      console.log("[FRONTEND] Stripe redirect URL received, redirecting...");
       window.location.href = session.url;
     } catch (error) {
-      console.error("Stripe Checkout Error:", error);
+      console.error("[FRONTEND] Checkout error:", error.message);
     } finally {
       setLoading(false);
     }
