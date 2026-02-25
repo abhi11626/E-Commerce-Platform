@@ -97,7 +97,7 @@ export default function Navbar() {
             {/* Hamburger */}
             <button
               onClick={handleToggleMenu}
-              className="md:hidden text-2xl"
+              className="md:hidden text-2xl text-white hover:text-purple-400 transition"
             >
               ☰
             </button>
