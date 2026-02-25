@@ -1,5 +1,3 @@
-// server.js
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -14,11 +12,11 @@ app.use(
     ],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // only if you're using cookies/auth
+    credentials: true,
   }),
 );
 
-app.options("*", cors()); // handle preflight
+app.options("*", cors());
 app.use(express.json());
 
 app.post("/api/create-checkout-session", async (req, res) => {
@@ -42,7 +40,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
       cancel_url: `${frontendUrl}/cancel`,
     });
 
-    // res.json({ id: session.id });
     res.json({ url: session.url });
   } catch (error) {
     console.error(error);
@@ -50,7 +47,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 });
 
-// Only listen on port 5000 if running locally
 if (process.env.NODE_ENV !== "production") {
   app.listen(5000);
 }
