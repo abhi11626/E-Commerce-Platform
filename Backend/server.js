@@ -10,8 +10,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "e-commerce-backend-xi-eosin.vercel.app",
-      "e-commerce-frontend-one-lemon.vercel.app",
+      process.env.FRONTEND_URL || "http://localhost:5173",
     ],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -56,5 +55,4 @@ if (process.env.NODE_ENV !== "production") {
   app.listen(5000);
 }
 
-// Export the app for Vercel serverless functions
-export default app;
+module.exports = app;

@@ -4,7 +4,6 @@ import { useContext, useState } from "react";
 import CartContext from "../context/CartContext";
 
 export default function Checkout() {
-  const backendUrl = import.meta.env.BACKEND_URL || "http://localhost:5000";
   const cartCtx = useContext(CartContext);
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +20,7 @@ export default function Checkout() {
     try {
       // Call your backend to create Stripe session
       const response = await fetch(
-        `${backendUrl}/api/create-checkout-session`,
+        "/api/create-checkout-session",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
