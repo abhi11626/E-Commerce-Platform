@@ -4,15 +4,14 @@ import { useContext, useState } from "react";
 import CartContext from "../context/CartContext";
 
 export default function Checkout() {
-<<<<<<< HEAD
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-=======
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-  console.log("[FRONTEND] VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL || "NOT SET (using fallback)");
+  console.log(
+    "[FRONTEND] VITE_BACKEND_URL:",
+    import.meta.env.VITE_BACKEND_URL || "NOT SET (using fallback)",
+  );
   console.log("[FRONTEND] Calling backend at:", backendUrl);
 
->>>>>>> 105d5c4f576892f818c6d1f0adc8e2e377daf974
   const cartCtx = useContext(CartContext);
   const [loading, setLoading] = useState(false);
 
@@ -27,10 +26,11 @@ export default function Checkout() {
     setLoading(true);
 
     try {
-<<<<<<< HEAD
-=======
-      console.log("[FRONTEND] Sending", cartCtx.items.length, "items to backend...");
->>>>>>> 105d5c4f576892f818c6d1f0adc8e2e377daf974
+      console.log(
+        "[FRONTEND] Sending",
+        cartCtx.items.length,
+        "items to backend...",
+      );
       const response = await fetch(
         `${backendUrl}/api/create-checkout-session`,
         {
@@ -51,10 +51,9 @@ export default function Checkout() {
       }
 
       const session = await response.json();
-<<<<<<< HEAD
-=======
+
       console.log("[FRONTEND] Stripe redirect URL received, redirecting...");
->>>>>>> 105d5c4f576892f818c6d1f0adc8e2e377daf974
+
       window.location.href = session.url;
     } catch (error) {
       console.error("[FRONTEND] Checkout error:", error.message);
