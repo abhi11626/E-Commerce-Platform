@@ -115,38 +115,83 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden bg-slate-800 shadow-lg px-4 py-3 space-y-2">
-          <Link
-            to="/"
+        <>
+          {/* backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             onClick={handleCloseMenu}
-            className="block text-gray-300 hover:text-yellow-400"
-          >
-            Home
-          </Link>
-          <Link
-            to="/products"
-            onClick={handleCloseMenu}
-            className="block text-gray-300 hover:text-yellow-400"
-          >
-            Products
-          </Link>
-          <Link
-            to="/contact-us"
-            onClick={handleCloseMenu}
-            className="block text-gray-300 hover:text-yellow-400"
-          >
-            Contact us
-          </Link>
-          {showCart && (
-            <Link
-              to="/checkout"
+          ></div>
+
+          {/* side menu */}
+          <div className="fixed inset-y-0 left-0 w-64 bg-slate-900 z-50 shadow-xl p-6 flex flex-col space-y-6">
+            {/* close */}
+            <button
               onClick={handleCloseMenu}
-              className="block text-gray-300 hover:text-yellow-400"
+              className="self-end text-2xl text-gray-400 hover:text-white transition"
             >
-              Checkout
-            </Link>
-          )}
-        </div>
+              ×
+            </button>
+
+            {/* mobile links */}
+            <NavLink
+              to="/"
+              onClick={handleCloseMenu}
+              className={({ isActive }) =>
+                `block text-lg font-medium px-4 py-3 rounded-xl transition ${
+                  isActive
+                    ? "bg-purple-700 text-white"
+                    : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                }`
+              }
+            >
+              Home
+            </NavLink>
+
+            <NavLink
+              to="/products"
+              onClick={handleCloseMenu}
+              className={({ isActive }) =>
+                `block text-lg font-medium px-4 py-3 rounded-xl transition ${
+                  isActive
+                    ? "bg-purple-700 text-white"
+                    : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                }`
+              }
+            >
+              Products
+            </NavLink>
+
+            <NavLink
+              to="/contact-us"
+              onClick={handleCloseMenu}
+              className={({ isActive }) =>
+                `block text-lg font-medium px-4 py-3 rounded-xl transition ${
+                  isActive
+                    ? "bg-purple-700 text-white"
+                    : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                }`
+              }
+            >
+              Contact us
+            </NavLink>
+
+            {showCart && (
+              <NavLink
+                to="/checkout"
+                onClick={handleCloseMenu}
+                className={({ isActive }) =>
+                  `block text-lg font-medium px-4 py-3 rounded-xl transition ${
+                    isActive
+                      ? "bg-purple-700 text-white"
+                      : "text-gray-300 hover:bg-slate-800 hover:text-white"
+                  }`
+                }
+              >
+                Checkout
+              </NavLink>
+            )}
+          </div>
+        </>
       )}
 
       {/* Cart Modal */}
