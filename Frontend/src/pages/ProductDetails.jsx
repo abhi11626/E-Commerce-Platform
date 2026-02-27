@@ -5,6 +5,7 @@ import CartContext from "../context/CartContext";
 export default function ProductDetails() {
   const product = useLoaderData();
   const cartCtx = useContext(CartContext);
+  const cartItem = cartCtx.items.find((item) => item.id === product.id);
 
   function handleAddToCart() {
     cartCtx.addItem(product);
@@ -45,13 +46,35 @@ export default function ProductDetails() {
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-4">
-            <button
-              onClick={handleAddToCart}
-              className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl transition duration-300"
-            >
-              Add to Cart
-            </button>
+          <div className="flex gap-4 items-center">
+            {!cartItem ? (
+              <button
+                onClick={handleAddToCart}
+                className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-xl transition duration-300 font-semibold"
+              >
+                Add to Cart
+              </button>
+            ) : (
+              <div className="flex items-center gap-5 bg-slate-800/60 backdrop-blur-md border border-white/10 rounded-xl px-5 py-3 hover:bg-slate-800 transition duration-300">
+                <button
+                  onClick={() => cartCtx.removeItem(product.id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition duration-200"
+                >
+                  -
+                </button>
+
+                <span className="text-lg font-semibold text-white">
+                  {cartItem.quantity}
+                </span>
+
+                <button
+                  onClick={() => cartCtx.addItem(product)}
+                  className="w-8 h-8 flex items-center justify-center rounded-md bg-purple-500/20 text-purple-400 hover:bg-purple-600 hover:text-white transition duration-200"
+                >
+                  +
+                </button>
+              </div>
+            )}
 
             <Link
               to="/checkout"

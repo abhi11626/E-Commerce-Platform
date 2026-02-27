@@ -46,13 +46,17 @@ export default function Navbar() {
             React Shop
           </Link>
           {/* Desktop Links */}
-          <div className="hidden md:flex space-x-6">
+
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center bg-slate-800/60 backdrop-blur-md rounded-full p-1 border border-white/10 relative">
             <NavLink
               to="/"
               className={({ isActive }) =>
-                isActive
-                  ? "text-yellow-400 font-semibold"
-                  : "text-gray-300 hover:text-yellow-400"
+                `relative px-5 py-2 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? "bg-purple-600 text-white shadow-md"
+                    : "text-gray-300 hover:text-white"
+                }`
               }
             >
               Home
@@ -61,9 +65,11 @@ export default function Navbar() {
             <NavLink
               to="/products"
               className={({ isActive }) =>
-                isActive
-                  ? "text-yellow-400 font-semibold"
-                  : "text-gray-300 hover:text-yellow-400"
+                `relative px-5 py-2 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? "bg-purple-600 text-white shadow-md"
+                    : "text-gray-300 hover:text-white"
+                }`
               }
             >
               Products
@@ -72,9 +78,11 @@ export default function Navbar() {
             <NavLink
               to="/contact-us"
               className={({ isActive }) =>
-                isActive
-                  ? "text-yellow-400 font-semibold"
-                  : "text-gray-300 hover:text-yellow-400"
+                `relative px-5 py-2 rounded-full transition-all duration-300 ${
+                  isActive
+                    ? "bg-purple-600 text-white shadow-md"
+                    : "text-gray-300 hover:text-white"
+                }`
               }
             >
               Contact us
