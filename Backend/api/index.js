@@ -4,7 +4,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const pool = require("./db");
+const pool = require("./db.js");
 
 const app = express();
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
@@ -121,6 +121,7 @@ app.post("/api/create-checkout-session", auth, async (req, res) => {
 });
 
 /* START */
-app.listen(5000, () => {
-  console.log("Backend running on http://localhost:5000");
-});
+// app.listen(5000, () => {
+//   console.log("Backend running on http://localhost:5000");
+// });
+module.exports = app;
