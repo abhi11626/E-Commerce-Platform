@@ -1,25 +1,29 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
-
-import { useState, useContext, useCallback } from "react";
+import { useState, useContext, useCallback, useMemo } from "react";
 import CartContext from "../context/CartContext";
 import Cart from "../pages/Cart";
 import logo from "../assets/logo.svg";
+import { useAuth } from "../hooks/useAuth.js";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
   const cartCtx = useContext(CartContext);
-  const totalCartItems = cartCtx.items.reduce(
-    (total, item) => total + item.quantity,
-    0,
-  );
+  const items = cartCtx.items;
+
+  const totalCartItems = useMemo(() => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  }, [items]);
+
+  const { logout, isAuthenticated } = useAuth();
 
   const location = useLocation();
 
-  const showCart =
-    location.pathname.startsWith("/products") ||
-    location.pathname.startsWith("/product");
+  const showCart = useMemo(() => {
+    const path = location.pathname;
+    return path.startsWith("/products") || path.startsWith("/product");
+  }, [location.pathname]);
 
   const handleCartClick = useCallback(() => {
     setIsCartModalOpen(true);
@@ -32,6 +36,15 @@ export default function Navbar() {
   const handleCloseMenu = useCallback(() => {
     setOpen(false);
   }, []);
+
+  const handleCloseCart = useCallback(() => {
+    setIsCartModalOpen(false);
+  }, []);
+
+  const handleLogoutMobile = useCallback(() => {
+    logout();
+    handleCloseMenu();
+  }, [logout, handleCloseMenu]);
 
   return (
     <nav className="sticky top-0 z-50 bg-slate-900 shadow-lg">
@@ -87,13 +100,34 @@ export default function Navbar() {
             >
               Contact us
             </NavLink>
+            {isAuthenticated() ? (
+              <button
+                onClick={logout}
+                className="relative px-5 py-2 rounded-full transition-all duration-300 bg-yellow-600 text-white shadow-md hover:bg-red-600"
+              >
+                Logout
+              </button>
+            ) : (
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `relative px-5 py-2 rounded-full transition-all duration-300 ${
+                    isActive
+                      ? "bg-purple-600 text-white shadow-md"
+                      : "text-gray-300 hover:text-white"
+                  }`
+                }
+              >
+                Login
+              </NavLink>
+            )}
           </div>
 
           {/* Right */}
           <div className="flex items-center space-x-4">
             {showCart && (
               <div className="relative">
-                <button onClick={() => handleCartClick()} className="text-2xl">
+                <button onClick={handleCartClick} className="text-2xl">
                   🛒
                 </button>
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -175,9 +209,16 @@ export default function Navbar() {
               Contact us
             </NavLink>
 
-            {showCart && (
+            {isAuthenticated() ? (
+              <button
+                onClick={handleLogoutMobile}
+                className="block text-lg px-3 py-2 rounded-lg transition-all duration-300 bg-yellow-600 text-white shadow-md hover:bg-red-600"
+              >
+                Logout
+              </button>
+            ) : (
               <NavLink
-                to="/checkout"
+                to="/login"
                 onClick={handleCloseMenu}
                 className={({ isActive }) =>
                   `block text-lg font-medium px-4 py-3 rounded-xl transition ${
@@ -187,7 +228,7 @@ export default function Navbar() {
                   }`
                 }
               >
-                Checkout
+                Login
               </NavLink>
             )}
           </div>
@@ -195,7 +236,7 @@ export default function Navbar() {
       )}
 
       {/* Cart Modal */}
-      <Cart open={isCartModalOpen} onClose={() => setIsCartModalOpen(false)} />
+      <Cart open={isCartModalOpen} onClose={handleCloseCart} />
     </nav>
   );
 }

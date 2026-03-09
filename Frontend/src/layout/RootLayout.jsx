@@ -8,6 +8,7 @@ export default function RootLayout() {
   return (
     <>
       <Navbar />
+
       <div className="bg-gray-950 text-white min-h-screen">
         {navigation.state === "loading" && <Loader />}
         <Outlet />

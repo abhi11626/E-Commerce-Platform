@@ -1,48 +1,73 @@
 import { formatCurrency } from "../components/utils/formatter";
 import CartItem from "./CartItem";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import CartContext from "../context/CartContext";
+import AuthContext from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 export default function Checkout() {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-  console.log(
-    "[FRONTEND] VITE_BACKEND_URL:",
-    import.meta.env.VITE_BACKEND_URL || "NOT SET (using fallback)",
-  );
-  console.log("[FRONTEND] Calling backend at:", backendUrl);
-
   const cartCtx = useContext(CartContext);
+  const auth = useContext(AuthContext);
+  const token = auth?.token;
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const cartTotal = cartCtx.items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
+  const { items, addItem, removeItem } = cartCtx;
 
-  async function handleStripeCheckout() {
-    if (cartCtx.items.length === 0) return;
+  const cartTotal = useMemo(() => {
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+  }, [items]);
+
+  const formattedCartTotal = useMemo(() => {
+    return formatCurrency(cartTotal);
+  }, [cartTotal]);
+
+  const itemHandlers = useMemo(() => {
+    const inc = new Map();
+    const dec = new Map();
+    for (const item of items) {
+      inc.set(item.id, () => addItem(item));
+      dec.set(item.id, () => removeItem(item.id));
+    }
+    return { inc, dec };
+  }, [items, addItem, removeItem]);
+
+  const handleStripeCheckout = useCallback(async () => {
+    if (items.length === 0 || loading) return;
+
+    // 🚨 USER NOT LOGGED IN
+    if (!token) {
+      const existingUser = window.confirm(
+        "Do you already have an account?\n\nOK = Login\nCancel = Signup",
+      );
+
+      if (existingUser) {
+        navigate("/login");
+      } else {
+        navigate("/signup");
+      }
+
+      return;
+    }
 
     setLoading(true);
 
     try {
-      console.log(
-        "[FRONTEND] Sending",
-        cartCtx.items.length,
-        "items to backend...",
-      );
       const response = await fetch(
         `${backendUrl}/api/create-checkout-session`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // 🔐 send JWT
+          },
           body: JSON.stringify({
-            items: cartCtx.items,
+            items,
           }),
         },
       );
-
-      console.log("[FRONTEND] Backend response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -52,15 +77,13 @@ export default function Checkout() {
 
       const session = await response.json();
 
-      console.log("[FRONTEND] Stripe redirect URL received, redirecting...");
-
       window.location.href = session.url;
     } catch (error) {
       console.error("[FRONTEND] Checkout error:", error.message);
     } finally {
       setLoading(false);
     }
-  }
+  }, [items, loading, navigate, token]);
 
   return (
     <>
@@ -71,21 +94,21 @@ export default function Checkout() {
             Order Summary
           </h2>
 
-          {cartCtx.items.length === 0 ? (
+          {items.length === 0 ? (
             <p className="text-gray-400 text-center py-10 text-base sm:text-lg">
               Your cart is empty
             </p>
           ) : (
             <>
               <ul className="space-y-4 max-h-72 sm:max-h-96 overflow-y-auto pr-2 sm:pr-3">
-                {cartCtx.items.map((item) => (
+                {items.map((item) => (
                   <CartItem
                     key={item.id}
                     name={item.title}
                     quantity={item.quantity}
                     price={item.price}
-                    onIncrease={() => cartCtx.addItem(item)}
-                    onDecrease={() => cartCtx.removeItem(item.id)}
+                    onIncrease={itemHandlers.inc.get(item.id)}
+                    onDecrease={itemHandlers.dec.get(item.id)}
                   />
                 ))}
               </ul>
@@ -93,7 +116,7 @@ export default function Checkout() {
               <div className="mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-white/10">
                 <p className="text-gray-400 text-sm">Total</p>
                 <p className="text-3xl sm:text-4xl font-bold text-purple-400 mt-2">
-                  {formatCurrency(cartTotal)}
+                  {formattedCartTotal}
                 </p>
               </div>
             </>
@@ -114,7 +137,7 @@ export default function Checkout() {
 
           <button
             onClick={handleStripeCheckout}
-            disabled={loading || cartCtx.items.length === 0}
+            disabled={loading || items.length === 0}
             className={`w-full mt-6 sm:mt-8 py-3 sm:py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg active:scale-95
             ${
               loading
@@ -128,7 +151,7 @@ export default function Checkout() {
                 Processing...
               </span>
             ) : (
-              `Pay ${formatCurrency(cartTotal)}`
+              `Pay ${formattedCartTotal}`
             )}
           </button>
 

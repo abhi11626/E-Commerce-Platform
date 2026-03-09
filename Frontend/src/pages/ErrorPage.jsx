@@ -12,6 +12,9 @@ export default function ErrorPage() {
   } else if (status === 404) {
     title = "Page Not Found";
     message = "The page you are looking for doesn’t exist.";
+  } else if (status === 400) {
+    title = "User Not Found";
+    message = "The user you are looking for doesn’t exist.";
   }
 
   return (

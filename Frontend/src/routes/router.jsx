@@ -16,6 +16,7 @@ const Signup = lazy(() => import("../pages/Signup"));
 const Success = lazy(() => import("../pages/Success"));
 const Cancel = lazy(() => import("../pages/Cancel"));
 const Health = lazy(() => import("../pages/Health"));
+const Login = lazy(() => import("../pages/login"));
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +63,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyBoundary>
             <ContactUs />
+          </LazyBoundary>
+        ),
+      },
+      {
+        path: "login",
+        element: (
+          <LazyBoundary>
+            <Login />
           </LazyBoundary>
         ),
       },

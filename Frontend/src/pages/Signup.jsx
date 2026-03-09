@@ -1,4 +1,5 @@
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import SubmitButton from "./Submit.jsx";
 
 import {
@@ -7,6 +8,9 @@ import {
   isEqualsToOtherValue,
   hasMinLength,
 } from "../components/utils/validation.js";
+
+const backendUrl =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 async function signupAction(prevFormState, formData) {
   const email = formData.get("email");
@@ -21,21 +25,22 @@ async function signupAction(prevFormState, formData) {
   if (!isEmail(email)) {
     errors.push("Please enter a valid email address.");
   }
+
   if (!isNotEmpty(password) || !hasMinLength(password, 6)) {
     errors.push("Password must be at least 6 characters long.");
   }
+
   if (!isEqualsToOtherValue(password, confirmPassword)) {
     errors.push("Passwords do not match.");
   }
+
   if (!isNotEmpty(firstName) || !isNotEmpty(lastName)) {
     errors.push("Please provide your first and last name.");
   }
+
   if (!terms) {
     errors.push("You must agree to the terms and conditions.");
   }
-  //  Fake delay to test pending state
-
-  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   if (errors.length > 0) {
     return {
@@ -52,18 +57,88 @@ async function signupAction(prevFormState, formData) {
     };
   }
 
-  return {
-    errors: null,
-    success: true,
-    enteredValues: {},
-  };
+  /* -------- CALL BACKEND -------- */
+
+  try {
+    const response = await fetch(`${backendUrl}/api/auth/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        firstName,
+        lastName,
+      }),
+    });
+
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
+
+    if (!response.ok) {
+      return {
+        errors: [
+          data.error ||
+            data.message ||
+            `Signup failed (status ${response.status})`,
+        ],
+        success: false,
+        enteredValues: {
+          email,
+          password,
+          confirmPassword,
+          firstName,
+          lastName,
+          terms,
+        },
+      };
+    }
+
+    return {
+      errors: null,
+      success: true,
+      enteredValues: {},
+    };
+  } catch (error) {
+    console.error("Signup error:", error);
+    return {
+      errors: ["Server error. Please try again."],
+      success: false,
+      enteredValues: {
+        email,
+        password,
+        confirmPassword,
+        firstName,
+        lastName,
+        terms,
+      },
+    };
+  }
 }
 
 export default function Signup() {
+  const navigate = useNavigate();
+
   const [formState, formAction] = useActionState(signupAction, {
     errors: null,
     success: false,
   });
+
+  /* -------- AUTO REDIRECT AFTER SUCCESS -------- */
+
+  useEffect(() => {
+    if (formState.success) {
+      const id = setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+      return () => clearTimeout(id);
+    }
+  }, [formState.success, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
@@ -76,7 +151,7 @@ export default function Signup() {
         {/* Success Message */}
         {formState.success && (
           <div className="bg-green-500/20 border border-green-400 text-green-300 px-4 py-3 rounded-lg animate-fadeIn">
-            🎉 Account created successfully!
+            🎉 Account created successfully! Redirecting to login...
           </div>
         )}
 
