@@ -78,31 +78,32 @@ export default function Login() {
     enteredValues: {},
     token: null,
   });
-  // useEffect(() => {
-  //   if (!formState.errors) return;
-
-  //   const shouldRedirectToSignup = formState.errors.some(
-  //     (msg) =>
-  //       typeof msg === "string" && msg.toLowerCase().includes("user not found"),
-  //   );
-
-  //   if (!shouldRedirectToSignup) return;
-
-  //   const id = setTimeout(() => {
-  //     navigate("/signup");
-  //   }, 3000);
-
-  //   return () => clearTimeout(id);
-  // }, [formState.errors, navigate]);
 
   useEffect(() => {
-    if (formState.errors) {
-      const id = setTimeout(() => {
-        navigate("/signup");
-      }, 5000);
-      return () => clearTimeout(id);
-    }
+    if (!formState.errors) return;
+
+    const shouldRedirectToSignup = formState.errors.some(
+      (msg) =>
+        typeof msg === "string" && msg.toLowerCase().includes("user not found"),
+    );
+
+    if (!shouldRedirectToSignup) return;
+
+    const id = setTimeout(() => {
+      navigate("/signup");
+    }, 3000);
+
+    return () => clearTimeout(id);
   }, [formState.errors, navigate]);
+
+  // useEffect(() => {
+  //   if (formState.errors) {
+  //     const id = setTimeout(() => {
+  //       navigate("/signup");
+  //     }, 5000);
+  //     return () => clearTimeout(id);
+  //   }
+  // }, [formState.errors, navigate]);
 
   useEffect(() => {
     if (!formState.token) return;
