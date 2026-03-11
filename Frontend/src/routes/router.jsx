@@ -3,7 +3,6 @@ import { lazy } from "react";
 import RootLayout from "../layout/RootLayout";
 import ErrorPage from "../pages/ErrorPage";
 import LazyBoundary from "../components/LazyBoundary";
-
 import { getProducts, getProductById } from "../api/prodcutApi";
 
 // Lazy load all page components for code splitting
@@ -57,6 +56,10 @@ export const router = createBrowserRouter([
             <Checkout />
           </LazyBoundary>
         ),
+        loader: () =>
+          import("../components/ProtectedRoute").then((module) =>
+            module.protectedLoader(),
+          ),
       },
       {
         path: "contact-us",
